@@ -353,6 +353,7 @@ static int camera_v4l2_s_fmt_vid_cap_mplane(struct file *filep, void *fh,
 
 set_fmt_fail:
 	kzfree(sp->vb2_q.drv_priv);
+	sp->vb2_q.drv_priv = NULL;
 	return rc;
 }
 
@@ -543,7 +544,6 @@ static int camera_v4l2_open(struct file *filep)
 		rc = msm_create_session(pvdev->vdev->num, pvdev->vdev);
 		if (rc < 0)
 			goto session_fail;
-
 		rc = msm_create_command_ack_q(pvdev->vdev->num, 0);
 		if (rc < 0)
 			goto command_ack_q_fail;
@@ -616,6 +616,7 @@ static int camera_v4l2_close(struct file *filep)
 
 		/* Donot wait, imaging server may have crashed */
 		msm_post_event(&event, -1);
+		msm_delete_command_ack_q(pvdev->vdev->num, 0);
 
 		/* This should take care of both normal close
 		 * and application crashes */
@@ -628,7 +629,6 @@ static int camera_v4l2_close(struct file *filep)
 
 		/* Donot wait, imaging server may have crashed */
 		msm_post_event(&event, MSM_POST_EVT_TIMEOUT);
-
 		msm_delete_command_ack_q(pvdev->vdev->num,
 			sp->stream_id);
 
