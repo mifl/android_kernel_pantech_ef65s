@@ -211,7 +211,10 @@ void mmc_request_done(struct mmc_host *host, struct mmc_request *mrq)
 	} else {
 		mmc_should_fail_request(host, mrq);
 
+#ifndef CONFIG_PANTECH
+		/* Pantech Not Use */
 		led_trigger_event(host->led, LED_OFF);
+#endif
 
 		pr_debug("%s: req done (CMD%u): %d: %08x %08x %08x %08x\n",
 			mmc_hostname(host), cmd->opcode, err,
@@ -323,7 +326,10 @@ mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
 #endif
 	}
 	mmc_host_clk_hold(host);
+#ifndef CONFIG_PANTECH
+	/* Pantech Not Use */
 	led_trigger_event(host->led, LED_FULL);
+#endif
 
 	if (host->card && host->clk_scaling.enable) {
 		/*
