@@ -182,13 +182,14 @@ config SND_SOC_MSM8974
 	select SND_SOC_WCD9320
 	select SND_DYNAMIC_MINORS
 	select AUDIO_OCMEM
-	select DOLBY_DAP
+	select DOLBY_DAP if !PANTECH_SND
 	help
 	 To add support for SoC audio on MSM8974.
 	 This will enable sound soc drivers which
 	 interfaces with DSP, also it will enable
 	 the machine drivers and the corresponding
 	 DAI-links.
+	 Pantech Sound not using Dolby sound effect.
 
 config SND_SOC_APQ8074
 	tristate "SoC Machine driver for APQ8O74 boards"
