@@ -79,3 +79,4 @@ obj-$(CONFIG_PN544) 		+= pn544.o
 obj-$(CONFIG_PN547) 		+= pn547.o
 #CONFIG_PANTECH_PS_WIFI_COM_PREF_LOGGING
 obj-$(CONFIG_PANTECH_PS_WIFI_COM_PREF_LOGGING) += wifi_log.o
+obj-y 				+= lvs_state.o
