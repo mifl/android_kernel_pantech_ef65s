@@ -1,0 +1,9 @@
+#ifndef BOARD_VER_EF65S_H
+#define BOARD_VER_EF65S_H
+
+#define PROJECT_NAME		"ef65s"
+#define PANTECH_BUILD_VER	"S0225121"
+#define PANTECH_BOARD_VER	tp20
+#define MSM8974_V22
+
+#endif /*BOARD_VER_EF65S_H*/
