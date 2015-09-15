@@ -43,6 +43,11 @@
 #include "pm-boot.h"
 #include "clock.h"
 
+#if defined(CONFIG_CHECK_HWREV_FOR_CHANGING_PROXIMITY_THRESHOLD)
+#include <linux/proc_fs.h>
+#include <mach/msm_smem.h>
+#endif
+
 #if defined(CONFIG_PANTECH_DEBUG)
 #if defined(CONFIG_PANTECH_DEBUG_SCHED_LOG)
 #include <mach/pantech_debug.h> //p14291_pantech_dbg
@@ -61,6 +66,10 @@
 #define SCLK_HZ (32768)
 
 #define MAX_BUF_SIZE  512
+
+#if defined(CONFIG_CHECK_HWREV_FOR_CHANGING_PROXIMITY_THRESHOLD)
+static void save_hwrev_forSensor_toProcfs(void);
+#endif
 
 static int msm_pm_debug_mask = 1;
 module_param_named(
@@ -918,6 +927,33 @@ void msm_pm_enable_retention(bool enable)
 }
 EXPORT_SYMBOL(msm_pm_enable_retention);
 
+#if defined(CONFIG_CHECK_HWREV_FOR_CHANGING_PROXIMITY_THRESHOLD)
+static oem_pm_smem_vendor1_data_type *smem_id_vendor1_ptr;
+static int read_proc_sensor(char *page, char **start,
+		off_t offset, int count, int *eof, void *data)
+{
+	int hw_rev;
+
+	if (smem_id_vendor1_ptr == NULL) {
+		smem_id_vendor1_ptr =
+			(oem_pm_smem_vendor1_data_type*)smem_alloc(SMEM_ID_VENDOR1,
+			sizeof(oem_pm_smem_vendor1_data_type));
+	}
+	hw_rev = (int)smem_id_vendor1_ptr->hw_rev;
+
+	return sprintf(page, "%d", hw_rev);
+}
+
+static void save_hwrev_forSensor_toProcfs(void) {
+	struct proc_dir_entry *entryForSensor;
+
+	entryForSensor = create_proc_entry("sensor_hwrev", 0, NULL);
+	if (entryForSensor) {
+		entryForSensor->read_proc = read_proc_sensor;
+	}
+}
+#endif
+
 static int msm_pm_snoc_client_probe(struct platform_device *pdev)
 {
 	int rc = 0;
@@ -941,6 +977,10 @@ static int msm_pm_snoc_client_probe(struct platform_device *pdev)
 		if (rc)
 			pr_err("%s: Error setting bus rate", __func__);
 	}
+
+#if defined(CONFIG_CHECK_HWREV_FOR_CHANGING_PROXIMITY_THRESHOLD)
+	save_hwrev_forSensor_toProcfs();
+#endif
 
 snoc_cl_probe_done:
 	return rc;
