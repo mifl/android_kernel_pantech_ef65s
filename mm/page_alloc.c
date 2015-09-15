@@ -786,6 +786,9 @@ bool is_cma_pageblock(struct page *page)
 {
 	return get_pageblock_migratetype(page) == MIGRATE_CMA;
 }
+#ifdef CONFIG_PANTECH
+EXPORT_SYMBOL(is_cma_pageblock); /* P14527: Add for texfat module */
+#endif /* CONFIG_PANTECH */
 
 /* Free whole pageblock and set it's migration type to MIGRATE_CMA. */
 void __init init_cma_reserved_pageblock(struct page *page)
