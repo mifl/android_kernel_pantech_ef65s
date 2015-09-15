@@ -51,7 +51,9 @@ static int32_t msm_led_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
 	int rc = 0;
 	struct msm_camera_led_cfg_t *cfg = (struct msm_camera_led_cfg_t *)data;
 	uint32_t i;
+#ifndef CONFIG_PANTECH_CAMERA//temp//for_fix_build_err//r2140.2_org
 	uint32_t curr_l, max_curr_l;
+#endif
 	CDBG("called led_state %d\n", cfg->cfgtype);
 
 	if (!fctrl) {
@@ -61,6 +63,9 @@ static int32_t msm_led_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
 
 	switch (cfg->cfgtype) {
 	case MSM_CAMERA_LED_OFF:
+#ifdef CONFIG_PANTECH_CAMERA //flash
+		qpnp_set_flash_mode(0);
+#endif
 		for (i = 0; i < fctrl->num_sources; i++)
 			if (fctrl->flash_trigger[i])
 				led_trigger_event(fctrl->flash_trigger[i], 0);
@@ -69,6 +74,14 @@ static int32_t msm_led_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
 		break;
 
 	case MSM_CAMERA_LED_LOW:
+#ifdef CONFIG_PANTECH_CAMERA //flash
+		//pr_err("%s : torch_op_current = %d\n",__func__, fctrl->torch_op_current/2);
+		qpnp_set_flash_mode(1);
+		if (fctrl->torch_trigger) {
+			led_trigger_event(fctrl->torch_trigger,
+				fctrl->torch_op_current/2);
+		}
+#else//r2140.2_org
 		if (fctrl->torch_trigger) {
 			max_curr_l = fctrl->torch_max_current;
 			if (cfg->torch_current > 0 &&
@@ -82,9 +95,23 @@ static int32_t msm_led_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
 			led_trigger_event(fctrl->torch_trigger,
 				curr_l);
 		}
+#endif
 		break;
 
-	case MSM_CAMERA_LED_HIGH:
+#ifdef CONFIG_PANTECH_CAMERA_ADD_SPLIT_HIGH_FLASH_CURRENT
+		case MSM_CAMERA_LED_MIDDLE:
+#ifdef CONFIG_PANTECH_CAMERA //flash
+		qpnp_set_flash_mode(0);
+		if (fctrl->torch_trigger)
+			led_trigger_event(fctrl->torch_trigger, 0);
+		//qpnp_set_flash_mode(1);
+		for (i = 0; i < fctrl->num_sources; i++)
+			if (fctrl->flash_trigger[i]) {
+				//pr_err("%s : flash_op_current = %d\n",__func__, fctrl->flash_op_current[i]/2);
+				led_trigger_event(fctrl->flash_trigger[i],
+					fctrl->flash_op_current[i]/2);
+		}
+#else//r2140.2_org
 		if (fctrl->torch_trigger)
 			led_trigger_event(fctrl->torch_trigger, 0);
 		for (i = 0; i < fctrl->num_sources; i++)
@@ -101,10 +128,52 @@ static int32_t msm_led_trigger_config(struct msm_led_flash_ctrl_t *fctrl,
 				led_trigger_event(fctrl->flash_trigger[i],
 					curr_l);
 			}
+#endif
+		break;
+#endif
+
+	case MSM_CAMERA_LED_HIGH:
+#ifdef CONFIG_PANTECH_CAMERA //flash
+		qpnp_set_flash_mode(0);
+		if (fctrl->torch_trigger)
+			led_trigger_event(fctrl->torch_trigger, 0);
+		//qpnp_set_flash_mode(1);
+		for (i = 0; i < fctrl->num_sources; i++)
+			if (fctrl->flash_trigger[i]) {
+				//pr_err("%s : flash_op_current = %d\n",__func__, fctrl->flash_op_current[i]/2);
+#ifdef CONFIG_PANTECH_CAMERA_ADD_SPLIT_HIGH_FLASH_CURRENT
+				led_trigger_event(fctrl->flash_trigger[i],
+					fctrl->flash_op_current[i]/2+200);
+#else
+				led_trigger_event(fctrl->flash_trigger[i],
+					fctrl->flash_op_current[i]/2);
+#endif
+		}
+#else//r2140.2_org
+		if (fctrl->torch_trigger)
+			led_trigger_event(fctrl->torch_trigger, 0);
+		for (i = 0; i < fctrl->num_sources; i++)
+			if (fctrl->flash_trigger[i]) {
+				max_curr_l = fctrl->flash_max_current[i];
+				if (cfg->flash_current[i] > 0 &&
+						cfg->flash_current[i] < max_curr_l) {
+					curr_l = cfg->flash_current[i];
+				} else {
+					curr_l = fctrl->flash_op_current[i];
+					pr_err("LED current clamped to %d\n",
+						curr_l);
+				}
+				led_trigger_event(fctrl->flash_trigger[i],
+					curr_l);
+			}
+#endif
 		break;
 
 	case MSM_CAMERA_LED_INIT:
 	case MSM_CAMERA_LED_RELEASE:
+#ifdef CONFIG_PANTECH_CAMERA //flash
+		qpnp_set_flash_mode(0);
+#endif
 		for (i = 0; i < fctrl->num_sources; i++)
 			if (fctrl->flash_trigger[i])
 				led_trigger_event(fctrl->flash_trigger[i], 0);

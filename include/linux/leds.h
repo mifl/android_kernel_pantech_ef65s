@@ -17,6 +17,10 @@
 #include <linux/rwsem.h>
 #include <linux/timer.h>
 
+#ifdef CONFIG_PANTECH_CAMERA //flash
+void qpnp_set_flash_mode(bool on);
+#endif
+
 struct device;
 /*
  * LED Core
