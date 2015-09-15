@@ -43,6 +43,12 @@
 #include "pm-boot.h"
 #include "clock.h"
 
+#if defined(CONFIG_PANTECH_DEBUG)
+#if defined(CONFIG_PANTECH_DEBUG_SCHED_LOG)
+#include <mach/pantech_debug.h> //p14291_pantech_dbg
+#endif
+#endif
+
 #define CREATE_TRACE_POINTS
 #include <mach/trace_msm_low_power.h>
 
@@ -677,6 +683,12 @@ static enum msm_pm_time_stats_id msm_pm_power_collapse(bool from_idle)
 	if (MSM_PM_DEBUG_POWER_COLLAPSE & msm_pm_debug_mask)
 		pr_info("CPU%u: %s: pre power down\n", cpu, __func__);
 
+#if defined(CONFIG_PANTECH_DEBUG)
+#if defined(CONFIG_PANTECH_DEBUG_SCHED_LOG)
+	pantechdbg_sched_msg("+(PC)");
+#endif
+#endif
+
 	/* This spews a lot of messages when a core is hotplugged. This
 	 * information is most useful from last core going down during
 	 * power collapse
@@ -699,6 +711,12 @@ static enum msm_pm_time_stats_id msm_pm_power_collapse(bool from_idle)
 
 	avs_set_avsdscr(avsdscr);
 	avs_set_avscsr(avscsr);
+
+#if defined(CONFIG_PANTECH_DEBUG)
+#if defined(CONFIG_PANTECH_DEBUG_SCHED_LOG)
+	pantechdbg_sched_msg("-(PC)");
+#endif
+#endif
 
 	if (MSM_PM_DEBUG_POWER_COLLAPSE & msm_pm_debug_mask)
 		pr_info("CPU%u: %s: post power up\n", cpu, __func__);
