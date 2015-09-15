@@ -20,6 +20,9 @@
  * 02110-1301 USA
  */
 
+#if defined(CONFIG_MACH_MSM8974_EF59S) || defined(CONFIG_MACH_MSM8974_EF59K) || defined(CONFIG_MACH_MSM8974_EF59L) || defined(CONFIG_MACH_MSM8974_EF60S) || defined(CONFIG_MACH_MSM8974_EF65S) || defined(CONFIG_MACH_MSM8974_EF61K) || defined(CONFIG_MACH_MSM8974_EF62L)
+#include <linux/leds-lp5523-pantech.h>
+#else
 #ifndef __LINUX_LP5523_H
 #define __LINUX_LP5523_H
 
@@ -46,3 +49,4 @@ struct lp5523_platform_data {
 };
 
 #endif /* __LINUX_LP5523_H */
+#endif
