@@ -92,7 +92,11 @@
 #include <linux/export.h>
 
 /* Set to 3 to get tracing... */
+#ifdef CONFIG_SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT
+#define ACONF_DEBUG 3
+#else
 #define ACONF_DEBUG 2
+#endif /* CONFIG_SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT */
 
 #if ACONF_DEBUG >= 3
 #define ADBG(x) printk x
@@ -277,6 +281,14 @@ static void addrconf_mod_timer(struct inet6_ifaddr *ifp,
 	switch (what) {
 	case AC_DAD:
 		ifp->timer.function = addrconf_dad_timer;
+
+#ifdef CONFIG_SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT
+	if (strncmp(ifp->idev->dev->name, "rmnet", 5) == 0) {
+		printk(KERN_CRIT "addrconf_mod_timer() DAD timer start when %lu to 50 ms\n", when);
+		when = 5;
+	}
+#endif /* CONFIG_SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT */
+
 		break;
 	case AC_RS:
 		ifp->timer.function = addrconf_rs_timer;
@@ -656,6 +668,15 @@ ipv6_add_addr(struct inet6_dev *idev, const struct in6_addr *addr, int pfxlen,
 	ifa->scope = scope;
 	ifa->prefix_len = pfxlen;
 	ifa->flags = flags | IFA_F_TENTATIVE;
+
+#ifdef CONFIG_SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT
+	if (strncmp(idev->dev->name, "rmnet",5) == 0 &&
+	    !(addr_type & IPV6_ADDR_LINKLOCAL)) {
+		printk(KERN_CRIT "ipv6_add_addr() set mask NODAD\n");
+		ifa->flags |= IFA_F_NODAD; 
+	}
+#endif /* CONFIG_SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT */
+
 	ifa->cstamp = ifa->tstamp = jiffies;
 
 	ifa->rt = rt;
