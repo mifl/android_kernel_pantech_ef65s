@@ -26,6 +26,9 @@ struct qpnp_vib_config {
 	enum qpnp_vib_en_mode	enable_mode;
 };
 #if defined(CONFIG_QPNP_VIBRATOR)
+#ifdef CONFIG_PANTECH
+#define VIBRATOR_PANTECH_PATCH // P13106 LS2 KYK
+#endif
 
 int qpnp_vibrator_config(struct qpnp_vib_config *vib_config);
 #else
