@@ -79,6 +79,12 @@
 #define MSMFB_WRITEBACK_SET_MIRRORING_HINT _IOW(MSMFB_IOCTL_MAGIC, 167, \
 						unsigned int)
 #define MSMFB_ASYNC_BLIT              _IOW(MSMFB_IOCTL_MAGIC, 168, unsigned int)
+
+#ifdef CONFIG_F_SKYDISP_SMARTDIMMING
+#define MSMFB_LCD_SMART_DIMMING_READ   _IOW(MSMFB_IOCTL_MAGIC, 202, struct mdss_panel_smart_dimming)
+#define MSMFB_LCD_SMART_DIMMING_WRITE   _IOW(MSMFB_IOCTL_MAGIC, 203, struct mdss_panel_gamma)
+#endif
+
 #define MSMFB_OVERLAY_PREPARE		_IOWR(MSMFB_IOCTL_MAGIC, 169, \
 						struct mdp_overlay_list)
 #define FB_TYPE_3D_PANEL 0x10101010

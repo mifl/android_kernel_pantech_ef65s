@@ -33,7 +33,11 @@
 
 		/* Fudge factors */
 		qcom,mdss-ab-factor = <2 1>;		/* 2 times    */
-		qcom,mdss-ib-factor = <6 5>;		/* 1.2 times  */
+		/*qcom,mdss-ib-factor = <6 5>;*/		/* 1.2 times */
+		/* PANTEC_DISPALY, kkcho, 20140530, workaround for underrun*/
+		/* qcom,mdss-ib-factor = <7 4>; */		/* 1.75 times */
+		/* KangMS for underrun */
+		qcom,mdss-ib-factor = <21 10>;		/* 2.1 times */
 		qcom,mdss-clk-factor = <5 4>;		/* 1.25 times */
 
 		qcom,max-clk-rate = <320000000>;
@@ -108,7 +112,7 @@
 			compatible = "qcom,mdss-fb";
 		};
 	};
-
+/*
 	mdss_dsi0: qcom,mdss_dsi@fd922800 {
 		compatible = "qcom,mdss-dsi-ctrl";
 		label = "MDSS DSI CTRL->0";
@@ -167,7 +171,7 @@
 				qcom,supply-post-off-sleep = <0>;
 		};
 	};
-
+*/
 	mdss_dsi1: qcom,mdss_dsi@fd922e00 {
 		compatible = "qcom,mdss-dsi-ctrl";
 		label = "MDSS DSI CTRL->1";

@@ -1191,7 +1191,11 @@ int mdss_dsi_cmdlist_tx(struct mdss_dsi_ctrl_pdata *ctrl,
 		ret_val = 0;
 
 	if (req->cb)
+#ifdef CONFIG_F_SKYDISP_SMARTDIMMING
+		req->cb(ret,NULL);
+#else
 		req->cb(ret);
+#endif
 
 	return ret_val;
 }
@@ -1218,7 +1222,11 @@ int mdss_dsi_cmdlist_rx(struct mdss_dsi_ctrl_pdata *ctrl,
 	}
 
 	if (req->cb)
+#ifdef CONFIG_F_SKYDISP_SMARTDIMMING
+		req->cb(len,req->rbuf);
+#else
 		req->cb(len);
+#endif
 
 	return ret;
 }
@@ -1371,6 +1379,9 @@ void mdss_dsi_timeout_status(struct mdss_dsi_ctrl_pdata *ctrl)
 
 	if (status & 0x0111) {
 		MIPI_OUTP(base + 0x00c0, status);
+#ifdef F_WA_WATCHDOG_DURING_BOOTUP
+		if(ctrl->octa_blck_set)
+#endif
 		pr_err("%s: status=%x\n", __func__, status);
 	}
 }
@@ -1486,6 +1497,9 @@ irqreturn_t mdss_dsi_isr(int irq, void *ptr)
 	pr_debug("%s: ndx=%d isr=%x\n", __func__, ctrl->ndx, isr);
 
 	if (isr & DSI_INTR_ERROR) {
+#ifdef F_WA_WATCHDOG_DURING_BOOTUP
+		if(ctrl->octa_blck_set)
+#endif
 		pr_err("%s: ndx=%d isr=%x\n", __func__, ctrl->ndx, isr);
 		mdss_dsi_error(ctrl);
 	}
