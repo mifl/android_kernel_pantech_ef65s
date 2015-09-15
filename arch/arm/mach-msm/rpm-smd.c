@@ -47,17 +47,101 @@
 #endif
 
 /* Debug Definitions */
+#ifdef CONFIG_PANTECH
+#define OEM_DDR_CLK_CONVERSION_SWITCH	// Inserted by dscheon. for real-time DDR clock switching.
+#endif
+
+#ifdef OEM_DDR_CLK_CONVERSION_SWITCH
+#define DDR_CLK_RESOURCE_TYPE		0x326B6C63
+#endif
 
 enum {
 	MSM_RPM_LOG_REQUEST_PRETTY	= BIT(0),
 	MSM_RPM_LOG_REQUEST_RAW		= BIT(1),
 	MSM_RPM_LOG_REQUEST_SHOW_MSG_ID	= BIT(2),
+#ifdef OEM_DDR_CLK_CONVERSION_SWITCH
+	MSM_RPM_USER_REQUEST_DDR_CLK	= BIT(3),
+#endif
 };
 
 static int msm_rpm_debug_mask;
 module_param_named(
 	debug_mask, msm_rpm_debug_mask, int, S_IRUGO | S_IWUSR
 );
+
+#ifdef OEM_DDR_CLK_CONVERSION_SWITCH
+static int fixed_ddr_clk;
+static int limitted_ddr_clk;
+const struct kernel_param *fixedclkKp;
+const struct kernel_param *limittedclkKp;
+
+static int set_fixed_ddr_clk_from_oem(const char *val, const struct kernel_param *kp)
+{
+	int ret = 0;
+	if (fixedclkKp == NULL)
+		fixedclkKp = kp;
+
+	if (limitted_ddr_clk) {
+		limitted_ddr_clk = 0;
+
+		ret = param_set_ulong("0", limittedclkKp);
+
+		limittedclkKp = NULL;
+	}
+
+	ret = param_set_ulong(val, kp);
+
+	pr_info("rpm_smd : ddr_clk fixed = %u \n", fixed_ddr_clk);
+
+	return ret;
+}
+
+static int set_limitted_ddr_clk_from_oem(const char *val, const struct kernel_param *kp)
+{
+	int ret = 0;
+	if (limittedclkKp == NULL)
+		limittedclkKp = kp;
+
+	if (fixed_ddr_clk) {
+		fixed_ddr_clk = 0;
+
+		ret = param_set_ulong("0", fixedclkKp);
+
+		fixedclkKp = NULL;
+	}
+
+	ret = param_set_ulong(val, kp);
+
+	pr_info("rpm_smd : ddr_clk limitted = %u \n", limitted_ddr_clk);
+
+	return ret;
+}
+
+static struct kernel_param_ops module_ops_fixed_ddr_clk = {
+	.set = set_fixed_ddr_clk_from_oem,
+	.get = param_get_ulong,
+};
+
+
+static struct kernel_param_ops module_ops_limitted_ddr_clk = {
+	.set = set_limitted_ddr_clk_from_oem,
+	.get = param_get_ulong,
+};
+
+module_param_cb(fixed_ddr_clk, &module_ops_fixed_ddr_clk, &fixed_ddr_clk, 0644);
+module_param_cb(limitted_ddr_clk, &module_ops_limitted_ddr_clk, &limitted_ddr_clk, 0644);
+MODULE_PARM_DESC(limitted_ddr_clk, "ddr_clk_limitted");
+MODULE_PARM_DESC(fixed_ddr_clk, "ddr_clk_fixed");
+/*
+ddr_931Mhz  = {0xb8, 0x34,0x0e,0x00};
+ddr_800Mhz  = {0x00, 0x35,0x0c,0x00};
+ddr_614Mhz  = {0x70, 0x5e,0x09,0x00};
+ddr_460Mhz  = {0xe0, 0x04,0x07,0x00};
+ddr_320Mhz  = {0x00, 0xe2,0x04,0x00};
+ddr_200Mhz  = {0x40, 0x0d,0x40,0x00};
+ddr_120Mhz  = {0xc0, 0xd4,0x01,0x00};
+*/
+#endif
 
 struct msm_rpm_driver_data {
 	const char *ch_name;
@@ -472,6 +556,64 @@ struct msm_rpm_ack_msg {
 LIST_HEAD(msm_rpm_ack_list);
 
 static DECLARE_COMPLETION(data_ready);
+
+#ifdef OEM_DDR_CLK_CONVERSION_SWITCH
+static int msm_rpm_ddr_clk_set(struct msm_rpm_request *cdata)
+{
+	int i, j;
+	int rc = 0;
+	u32 TempFixedvalue = fixed_ddr_clk;
+	u32 TempLimittedvalue = limitted_ddr_clk;
+	u32 value = 0;
+
+	if (TempFixedvalue) {
+		for (i = 0; i < 4; i++)
+			cdata->buf[36+i]	= 0;
+		for (i = 0; (i < cdata->write_idx); i++) {
+			for (j = 0; j < cdata->kvp[i].nbytes; j+=4)
+				memcpy(&cdata->buf[36], &TempFixedvalue,min(sizeof(uint32_t),cdata->kvp[i].nbytes - j));
+		}
+	} else if (TempLimittedvalue) {
+		for (i = 0; (i < cdata->write_idx); i++) {
+			for (j = 0; j < cdata->kvp[i].nbytes; j+=4)
+				memcpy(&value, &cdata->kvp[i].value[j],min(sizeof(uint32_t),cdata->kvp[i].nbytes - j));
+		}
+
+		if (value > TempLimittedvalue) {
+			for (i = 0; (i < cdata->write_idx); i++) {
+				for (j = 0; j < cdata->kvp[i].nbytes; j+=4)
+					memcpy(&cdata->buf[36], &TempLimittedvalue,min(sizeof(uint32_t),cdata->kvp[i].nbytes - j));
+			}
+		}
+	} else {
+		pr_info("DDR CLK is not OEM's Set");
+		rc = 1;
+	}
+
+	return !rc;
+#if (0)
+	if (TempFixedvalue) {
+		for (i = 0; i < 4; i++)
+			cdata->buf[36+i]	= 0;
+		for (i = 0; (i < cdata->write_idx); i++) {
+			for (j = 0; j < cdata->kvp[i].nbytes; j+=4)
+				memcpy(&cdata->buf[36], &TempFixedvalue,min(sizeof(uint32_t),cdata->kvp[i].nbytes - j));
+		}
+	}
+	else
+		pr_info("DDR CLK was OEM Not Set");
+#endif
+}
+
+static void msm_rpm_ddr_clk_log(struct msm_rpm_request *cdata)
+{
+	u32 value = 0;
+
+	memcpy(&value, &cdata->buf[36],4);
+
+	pr_info("Current Setting DDR CLK %u Khz", value);
+}
+#endif
 
 static void msm_rpm_notify_sleep_chain(struct rpm_message_header *hdr,
 		struct msm_rpm_kvp_data *kvp)
@@ -1123,6 +1265,14 @@ static int msm_rpm_send_data(struct msm_rpm_request *cdata,
 		return ret;
 	}
 
+#ifdef OEM_DDR_CLK_CONVERSION_SWITCH
+	if (msm_rpm_debug_mask & MSM_RPM_USER_REQUEST_DDR_CLK) {
+		if (cdata->msg_hdr.resource_type == DDR_CLK_RESOURCE_TYPE) {
+			if (msm_rpm_ddr_clk_set(cdata))
+				msm_rpm_ddr_clk_log(cdata);
+		}
+	}
+#endif
 	msm_rpm_add_wait_list(cdata->msg_hdr.msg_id);
 
 	ret = msm_rpm_send_smd_buffer(&cdata->buf[0], msg_size, noirq);
