@@ -41,6 +41,14 @@
 #define MAX_RAILS 5
 #define MAX_THRESHOLD 2
 
+#ifdef CONFIG_PANTECH
+#define FEATURE_PANTECH_ECO_CPU_MODE
+#endif
+
+#if defined(FEATURE_PANTECH_ECO_CPU_MODE)
+static int ecocpu;
+#endif
+
 static struct msm_thermal_data msm_thermal_info;
 static struct delayed_work check_temp_work;
 static bool core_control_enabled;
@@ -1552,6 +1560,27 @@ static struct kernel_param_ops module_ops = {
 module_param_cb(enabled, &module_ops, &enabled, 0644);
 MODULE_PARM_DESC(enabled, "enforce thermal limit on cpu");
 
+#if defined(FEATURE_PANTECH_ECO_CPU_MODE)
+static int set_ecocpu(const char *val, const struct kernel_param *kp)
+{
+	int ret = 0;
+
+	ret = param_set_bool(val, kp);
+
+	pr_info("msm_thermal: ecocpu = %d\n", ecocpu);
+
+	return ret;
+}
+
+static struct kernel_param_ops module_ops_ecocpu = {
+	.set = set_ecocpu,
+	.get = param_get_bool,
+};
+
+module_param_cb(ecocpu, &module_ops_ecocpu, &ecocpu, 0644);
+MODULE_PARM_DESC(ecocpu, "ecocpu on");
+#endif /* FEATURE_PANTECH_ECO_CPU_MODE */
+
 static ssize_t show_cc_enabled(struct kobject *kobj,
 		struct kobj_attribute *attr, char *buf)
 {
@@ -1791,6 +1820,10 @@ int __devinit msm_thermal_init(struct msm_thermal_data *pdata)
 		return -EINVAL;
 
 	enabled = 1;
+#if defined(FEATURE_PANTECH_ECO_CPU_MODE)
+	ecocpu=0;
+#endif
+
 	ret = cpufreq_register_notifier(&msm_thermal_cpufreq_notifier,
 			CPUFREQ_POLICY_NOTIFIER);
 	if (ret)
