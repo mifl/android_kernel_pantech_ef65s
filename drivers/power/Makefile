@@ -60,7 +60,18 @@ obj-$(CONFIG_PM8XXX_CCADC)	+= pm8xxx-ccadc.o
 obj-$(CONFIG_PM8921_BMS)	+= pm8921-bms.o
 obj-$(CONFIG_QPNP_BMS)		+= qpnp-bms.o
 obj-$(CONFIG_PM8921_CHARGER)	+= pm8921-charger.o
+ifeq ($(CONFIG_PANTECH),y)
+obj-$(CONFIG_QPNP_CHARGER)	+= qpnp-charger-pantech.o
+else
 obj-$(CONFIG_QPNP_CHARGER)	+= qpnp-charger.o
+endif
 obj-$(CONFIG_LTC4088_CHARGER)	+= ltc4088-charger.o
 obj-$(CONFIG_CHARGER_SMB347)	+= smb347-charger.o
 obj-$(CONFIG_BATTERY_BCL)	+= battery_current_limit.o
+
+#for pantech msm8974 device
+obj-$(CONFIG_PANTECH_PMIC_FUELGAUGE_MAX17058)   += max17058_battery_pantech.o
+obj-$(CONFIG_PANTECH_EF63_PMIC_FUELGAUGE_MAX17058) += pt_max17058_battery.o
+obj-$(CONFIG_PANTECH_PMIC_CHARGER_SMB349) 	+= smb349_charger_pantech.o
+obj-$(CONFIG_PANTECH_PMIC_CHARGER_SMB347) 	+= smb347_charger_pantech.o
+obj-$(CONFIG_PANTECH_PMIC_CHARGER_BQ2419X) 	+= pt_bq2419x_charger.o
