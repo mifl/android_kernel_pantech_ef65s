@@ -301,6 +301,16 @@ config F_QUALCOMM_MDP_RGB_LAYER_UNDERRUN
 config F_QUALCOMM_MOVIE_PLAYER_MDP_ROTATOR_UNDERRUN
 	bool
 
+##############################################################
+# ADD NEW CONFIGS OR FEARTURES HERE
+##############################################################
+
+config F_SKYDISP_COMMON
+	bool "Conmon display configuration"
+	default y
+	help
+	  Use this config to add new codes, join common configs or avoid orphan codes
+
 endmenu
 
 endif
