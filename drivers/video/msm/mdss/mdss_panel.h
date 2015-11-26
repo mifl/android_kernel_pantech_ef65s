@@ -349,15 +349,6 @@ struct mdss_panel_data {
 	int silent_flag;
 	int silent_backlight;
 #endif
-#ifdef CONFIG_F_SKYDISP_HBM_FOR_AMOLED
-	int hbm_flag;
-	char hbm_state_ret[5];
-	void (*hbm_control)(struct mdss_panel_data *pdata, int state);
-	void (*acl_control)(struct mdss_panel_data *pdata, int state);
-#endif
-#ifdef CONFIG_F_SKYDISP_AMOLED_READ_DATA
-	void (*panel_read)(struct mdss_panel_data *pdata, int state);
-#endif
 };
 
 /**

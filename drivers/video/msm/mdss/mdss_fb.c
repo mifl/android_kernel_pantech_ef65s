@@ -331,76 +331,6 @@ static ssize_t msm_fb_panel_show(struct device *dev,
 static DEVICE_ATTR(panel_power_on, S_IRUGO | S_IWUSR, msm_fb_panel_show, NULL);
 #endif /* CONFIG_F_SKYDISP_FACTORY_SLEEP_ENABLE */
 
-#ifdef CONFIG_F_SKYDISP_HBM_FOR_AMOLED
-static ssize_t msm_fb_hbm_store(struct device *dev, struct device_attribute *attr, 
-			const char *buf,size_t count)
-{
-	struct fb_info *fbi = dev_get_drvdata(dev);
-	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
-	struct mdss_panel_info *pdata = mfd->panel_info;
-	struct mdss_panel_data * ctrl_pdata =NULL;
-
-	ctrl_pdata = container_of(pdata, struct mdss_panel_data,
-				panel_info);
-
-	strcpy(ctrl_pdata->hbm_state_ret,buf);
-
-	if (strncmp(ctrl_pdata->hbm_state_ret,"off",3) == 0)
-		ctrl_pdata->hbm_control(ctrl_pdata, 0);
-	else if (strncmp(ctrl_pdata->hbm_state_ret,"on",2) == 0)
-		ctrl_pdata->hbm_control(ctrl_pdata, 1);
-	else
-		printk("msm_fb_hbm_store err\n");
-
-	return count;
-}
-
-static ssize_t msm_fb_hbm_show(struct device *dev,
-					  struct device_attribute *attr, char *buf)
-{
-	struct fb_info *fbi = dev_get_drvdata(dev);
-	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
-	struct mdss_panel_info *pdata = mfd->panel_info;
-	struct mdss_panel_data * ctrl_pdata =NULL;
-
-	ctrl_pdata = container_of(pdata, struct mdss_panel_data,
-				panel_info);
-
-	return sprintf(buf, "%s\n", ctrl_pdata->hbm_state_ret);
-
-}
-
-static DEVICE_ATTR(hbm_ctl, S_IRUGO | S_IWUSR, msm_fb_hbm_show, msm_fb_hbm_store);
-
-static ssize_t msm_fb_acl_store(struct device *dev, struct device_attribute *attr, 
-			const char *buf,size_t count)
-{
-	struct fb_info *fbi = dev_get_drvdata(dev);
-	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
-	struct mdss_panel_info *pdata = mfd->panel_info;
-	struct mdss_panel_data * ctrl_pdata =NULL;
-
-	ctrl_pdata = container_of(pdata, struct mdss_panel_data,
-				panel_info);
-
-	strcpy(ctrl_pdata->hbm_state_ret,buf);
-
-	if (strncmp(ctrl_pdata->hbm_state_ret,"off",3) == 0)
-		ctrl_pdata->acl_control(ctrl_pdata, 0);
-	else if (strncmp(ctrl_pdata->hbm_state_ret,"25",2) == 0)
-		ctrl_pdata->acl_control(ctrl_pdata, 1);
-	else if (strncmp(ctrl_pdata->hbm_state_ret,"30",2) == 0)
-		ctrl_pdata->acl_control(ctrl_pdata, 2);
-	else if (strncmp(ctrl_pdata->hbm_state_ret,"50",2) == 0)
-		ctrl_pdata->acl_control(ctrl_pdata, 3);
-	else
-		printk("msm_fb_acl_store err\n");
-
-	return count;
-}
-static DEVICE_ATTR(acl_ctl, S_IRUGO | S_IWUSR, NULL, msm_fb_acl_store);
-#endif /* CONFIG_F_SKYDISP_HBM_FOR_AMOLED */
-
 #ifdef CONFIG_F_SKYDISP_CABC_CONTROL
 extern void cabc_control(struct mdss_panel_data *pdata, int state);
 char cabc_state_ret[5];
@@ -479,67 +409,6 @@ static ssize_t msm_fb_sharpness_show(struct device *dev,
 }
 static DEVICE_ATTR(sharpness_ctl, 644/*S_IRUGO | S_IWUSR*//*changed due to CTS fail*/, msm_fb_sharpness_show, msm_fb_sharpness_store);
 #endif /* CONFIG_F_SKYDISP_SHARPNESS_CTRL */
-
-#ifdef CONFIG_F_SKYDISP_EF63_DRIVER_IC_CHECK
-static ssize_t msm_fb_manufacture_id_show(struct device *dev,
-					  struct device_attribute *attr, char *buf)
-{
-	struct fb_info *fbi = dev_get_drvdata(dev);
-	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
-	struct mdss_panel_info *pdata = mfd->panel_info;
-	struct mdss_panel_data * ctrl_pdata =NULL;
-	struct mdss_dsi_ctrl_pdata *panel_pdata = NULL;
-
-	ctrl_pdata = container_of(pdata, struct mdss_panel_data,
-				panel_info);
-
-	panel_pdata = container_of(ctrl_pdata, struct mdss_dsi_ctrl_pdata,panel_data);
-
-	printk("msm_fb_manufacture_id : %d \n",panel_pdata->manufacture_id);
-
-	return sprintf(buf, "%d\n", panel_pdata->manufacture_id);
-}
-static DEVICE_ATTR(manufacture_id, 644, msm_fb_manufacture_id_show, NULL);
-#endif /* CONFIG_F_SKYDISP_EF63_DRIVER_IC_CHECK */
-
-#ifdef CONFIG_F_SKYDISP_AMOLED_READ_DATA
-#if 0
-static ssize_t msm_fb_register_show(struct device *dev,
-					  struct device_attribute *attr, char *buf)
-{
-	struct fb_info *fbi = dev_get_drvdata(dev);
-	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
-	struct mdss_panel_info *pdata = mfd->panel_info;
-	struct mdss_panel_data * ctrl_pdata =NULL;
-
-	ctrl_pdata = container_of(pdata, struct mdss_panel_data,
-				panel_info);
-
-	ctrl_pdata->panel_read(ctrl_pdata, 1);
-
-
-	return count;
-}
-#endif
-
-static ssize_t msm_fb_register_store(struct device *dev, struct device_attribute *attr, 
-			const char *buf,size_t count)
-{
-	struct fb_info *fbi = dev_get_drvdata(dev);
-	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)fbi->par;
-	struct mdss_panel_info *pdata = mfd->panel_info;
-	struct mdss_panel_data * ctrl_pdata =NULL;
-
-	ctrl_pdata = container_of(pdata, struct mdss_panel_data,
-				panel_info);
-
-	ctrl_pdata->panel_read(ctrl_pdata, 1);
-
-
-	return count;
-}
-static DEVICE_ATTR(reg_read, 644, NULL, msm_fb_register_store);
-#endif /* CONFIG_F_SKYDISP_AMOLED_READ_DATA */
 
 #ifdef CONFIG_F_SKYDISP_CMDS_CONTROL
 char cmds_state_ret[5];
@@ -796,16 +665,6 @@ static struct attribute *mdss_fb_attrs[] = {
 #endif
 #ifdef CONFIG_F_SKYDISP_FACTORY_SLEEP_ENABLE
 	&dev_attr_panel_power_on.attr,
-#endif
-#ifdef CONFIG_F_SKYDISP_HBM_FOR_AMOLED
-	&dev_attr_hbm_ctl.attr,
-	&dev_attr_acl_ctl.attr,
-#endif
-#ifdef CONFIG_F_SKYDISP_EF63_DRIVER_IC_CHECK
-	&dev_attr_manufacture_id.attr,
-#endif
-#ifdef CONFIG_F_SKYDISP_AMOLED_READ_DATA
-	&dev_attr_reg_read.attr,
 #endif
 	NULL,
 };
@@ -1184,9 +1043,7 @@ static void mdss_fb_scale_bl(struct msm_fb_data_type *mfd, u32 *bl_lvl)
 		 * bl_scale is the numerator of
 		 * scaling fraction (x/1024)
 		 */
-#ifndef CONFIG_MACH_MSM8974_EF63S
 		temp = (temp * mfd->bl_scale) / 1024;
-#endif
 
 		/*if less than minimum level, use min level*/
 		if (temp < mfd->bl_min_lvl)
@@ -1207,15 +1064,7 @@ void mdss_fb_set_backlight(struct msm_fb_data_type *mfd, u32 bkl_lvl)
 	if (((!mfd->panel_power_on && mfd->dcm_state != DCM_ENTER)
 		|| !mfd->bl_updated) && !IS_CALIB_MODE_BL(mfd)) {
 		mfd->unset_bl_level = bkl_lvl;
-#if defined(CONFIG_MACH_MSM8974_EF63S) || defined(CONFIG_MACH_MSM8974_EF63K) || defined(CONFIG_MACH_MSM8974_EF63L)				
-		if (mfd->bl_level_old != temp) {
-			;
-		} else {
-			return;
-		}
-#else
 		return;
-#endif
 	} else {
 		mfd->unset_bl_level = 0;
 	}
@@ -1530,9 +1379,6 @@ static int mdss_fb_register(struct msm_fb_data_type *mfd)
 #elif defined(CONFIG_MACH_MSM8974_EF59S) || defined(CONFIG_MACH_MSM8974_EF59K) || defined(CONFIG_MACH_MSM8974_EF59L)
 	var->height = 130,	/* height of picture in mm */
 	var->width = 73,	/* width of picture in mm */
-#elif defined(CONFIG_MACH_MSM8974_EF63S) || defined(CONFIG_MACH_MSM8974_EF63K) || defined(CONFIG_MACH_MSM8974_EF63L)
-	var->height = 117,	/* height of picture in mm */
-	var->width = 66,	/* width of picture in mm */
 #else
 	var->height = -1,	/* height of picture in mm */
 	var->width = -1,	/* width of picture in mm */
@@ -2739,24 +2585,9 @@ static int mdss_fb_ioctl(struct fb_info *info, unsigned int cmd,
 	int ret = -ENOSYS;
 	struct mdp_buf_sync buf_sync;
 	struct msm_sync_pt_data *sync_pt_data = NULL;
-#ifdef CONFIG_F_SKYDISP_SMARTDIMMING
-	struct mdss_panel_info *panel_info = NULL;
-	struct mdss_panel_data * pdata =NULL;
-	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
-#endif
-
 	if (!info || !info->par)
 		return -EINVAL;
 	mfd = (struct msm_fb_data_type *)info->par;
-
-#ifdef CONFIG_F_SKYDISP_SMARTDIMMING
-	panel_info = mfd->panel_info;
-	pdata = container_of(panel_info, struct mdss_panel_data,
-				panel_info);
-	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
-				panel_data);
-#endif
-
 	mdss_fb_power_setting_idle(mfd);
 	if ((cmd != MSMFB_VSYNC_CTRL) && (cmd != MSMFB_OVERLAY_VSYNC_CTRL) &&
 			(cmd != MSMFB_ASYNC_BLIT) && (cmd != MSMFB_BLIT) &&
@@ -2811,21 +2642,6 @@ static int mdss_fb_ioctl(struct fb_info *info, unsigned int cmd,
 	case MSMFB_DISPLAY_COMMIT:
 		ret = mdss_fb_display_commit(info, argp);
 		break;
-
-#ifdef CONFIG_F_SKYDISP_SMARTDIMMING
-	case MSMFB_LCD_SMART_DIMMING_READ:
-		ret = copy_to_user(argp, &ctrl_pdata->panel_read_mtp,
-				   sizeof(ctrl_pdata->panel_read_mtp));
-		pr_err("#MSMFB_LCD_SMART_DIMMING_READ\n");
-		break;
-
-	case MSMFB_LCD_SMART_DIMMING_WRITE:
-			ret = copy_from_user(&ctrl_pdata->gamma_set, argp,
-			sizeof(ctrl_pdata->gamma_set));
-			ctrl_pdata->gamma_sort(ctrl_pdata);
-			pr_err("#MSMFB_LCD_SMART_DIMMING_WRITE\n");
-		break;
-#endif
 
 	default:
 		if (mfd->mdp.ioctl_handler)

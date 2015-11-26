@@ -128,45 +128,6 @@ config DEFINE_LIST_EF62L
 	select F_SKYDISP_BOTTOM_CURRENT
 endif
 
-if MACH_MSM8974_EF63S
-config DEFINE_LIST_EF63S
-	bool
-	default y
-	select F_SKYDISP_EF63_SS
-	select F_SKYDISP_HBM_FOR_AMOLED
-	select F_SKYDISP_ELVSS_WORK
-	select F_SKYDISP_SMARTDIMMING
-	select F_SKYDISP_EF63_DRIVER_IC_CHECK
-	select F_SKYDISP_AMOLED_READ_DATA
-	select F_SKYDISP_BOTTOM_CURRENT
-endif
-
-if MACH_MSM8974_EF63K
-config DEFINE_LIST_EF63K
-	bool
-	default y
-	select F_SKYDISP_EF63_SS
-	select F_SKYDISP_HBM_FOR_AMOLED
-	select F_SKYDISP_ELVSS_WORK
-	select F_SKYDISP_SMARTDIMMING
-	select F_SKYDISP_EF63_DRIVER_IC_CHECK
-	select F_SKYDISP_AMOLED_READ_DATA
-	select F_SKYDISP_BOTTOM_CURRENT
-endif
-
-if MACH_MSM8974_EF63L
-config DEFINE_LIST_EF63L
-	bool
-	default y
-	select F_SKYDISP_EF63_SS
-	select F_SKYDISP_HBM_FOR_AMOLED
-	select F_SKYDISP_ELVSS_WORK
-	select F_SKYDISP_SMARTDIMMING
-	select F_SKYDISP_EF63_DRIVER_IC_CHECK
-	select F_SKYDISP_AMOLED_READ_DATA
-	select F_SKYDISP_BOTTOM_CURRENT
-endif
-
 ##############################################################
 ##############################################################
 #               PANTECH  FEARTURE                            #
@@ -202,16 +163,6 @@ config F_SKYDISP_EF59_SS
 # Description : EF60/61/62 Series model LCD common
 ##############################################################
 config F_SKYDISP_EF60_SS
-	bool
-
-##############################################################
-# owner  : p10443
-# date    : 2013.11.26
-# PLM    :
-# Case  :
-# Description : EF63 Series model LCD common
-##############################################################
-config F_SKYDISP_EF63_SS
 	bool
 
 ##############################################################
@@ -272,57 +223,6 @@ config F_SKYDISP_CMDS_CONTROL
 # Description : backlight on/off
 ##############################################################
 config F_SKYDISP_BACKLIGHT_CMDS_CTL
-	bool
-
-##############################################################
-# owner  : p13832
-# date    : 2014.01.23
-# PLM    :
-# Case  :
-# Description : oled hbm on/off
-##############################################################
-config F_SKYDISP_HBM_FOR_AMOLED
-	bool
-
-##############################################################
-# owner  : p13832
-# date    : 2014.01.28
-# PLM    :
-# Case  :
-# Description : oled elvss porting
-##############################################################
-config F_SKYDISP_ELVSS_WORK
-	bool
-
-##############################################################
-# owner  : p13832
-# date    : 2014.02.04
-# PLM    :
-# Case  :
-# Description : oled smart dimming
-##############################################################
-config F_SKYDISP_SMARTDIMMING
-	bool
-
-##############################################################
-# owner  : p12452
-# date    : 2014.03.04
-# PLM    :
-# Case  :
-# Description : driver ic manufacture_id check
-##############################################################
-config F_SKYDISP_EF63_DRIVER_IC_CHECK
-	bool
-
-
-##############################################################
-# owner  : p13832
-# date    : 2014.03.011
-# PLM    :
-# Case  :
-# Description : driver ic read(register)
-##############################################################
-config F_SKYDISP_AMOLED_READ_DATA
 	bool
 
 ##############################################################
