@@ -22,18 +22,10 @@ ifeq "$(KERNEL_USE_OF)" "y"
 ifeq ($(OEM_PRODUCT_MANUFACTURER),PANTECH)
 PANTECH_PRODUCT_MODEL := $(shell echo $(PROJECT_NAME) | tr A-Z a-z)
 PANTECH_BOARD_VERSION := $(shell echo $(PANTECH_BOARD_VER) | tr A-Z a-z)
-ifeq ($(MSM_VER),V30)
-ifeq ($(PANTECH_BOARD_VERSION),)
-DTS_FILES = $(wildcard $(TOP)/kernel/arch/arm/boot/dts/msm8974pro-ab-pm8941-$(PANTECH_PRODUCT_MODEL).dts)
-else
-DTS_FILES = $(wildcard $(TOP)/kernel/arch/arm/boot/dts/msm8974pro-ab-pm8941-$(PANTECH_PRODUCT_MODEL)-$(PANTECH_BOARD_VERSION).dts)
-endif
-else
 ifeq ($(PANTECH_BOARD_VERSION),)
 DTS_FILES = $(wildcard $(TOP)/kernel/arch/arm/boot/dts/msm8974-v2.2-$(PANTECH_PRODUCT_MODEL).dts)
 else
 DTS_FILES = $(wildcard $(TOP)/kernel/arch/arm/boot/dts/msm8974-v2.2-$(PANTECH_PRODUCT_MODEL)-$(PANTECH_BOARD_VERSION).dts)
-endif
 endif
 else
 DTS_FILES = $(wildcard $(TOP)/kernel/arch/arm/boot/dts/$(DTS_NAME)*.dts)
