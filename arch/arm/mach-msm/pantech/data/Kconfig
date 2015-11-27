@@ -98,50 +98,10 @@ config SKY_DS_CHANGE_RNDIS_MTU
 	default y
 	help
 
-config SKY_DS_ACCEPT_SIP_LAGRE_PACKET
-	bool "accept SIP packet over MTU size"
-	default y
-	help
-
-config SKY_DS_TCP_INIFINITE_LOOP_BUG_FIX
-	bool "avoid infinite loop on recvmsg by tcp"
-	default y
-	help
-
-config SKY_DS_KERNEL_CRASH_DUT_TO_NULL_POINTER
-	bool "kernel crash due to null pointer dereference security patch 2013-6432"
-	default y
-	help
-
 config SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT
 	bool "IPv6 Address Asignment"
 	default y
 	help
-
-config SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT_CRASH_FIX
-	bool "Prevent device from crashing"
-	depends on SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT
-	default y
-	help
-	  Device crashed when optimizing IPv6 address assignment which means reducing assignment duration.
-	  It's crashed because 'ifa->idev' is null at 'if6_get_first' function.
-
-config SKY_DS_ANDROID_SECURITY_PATCH_CVE_2014_2851
-	bool "net: ipv4: current group_info should be put after using."
-	default y
-	help
-	  Plug a group_info refcount leak in ping_init.
-	  group_info is only needed during initialization and
-	  the code failed to release the reference on exit.
-	  While here move grabbing the reference to a place
-	  where it is actually needed.
-
-config SKY_DS_ANDROID_SECURITY_PATCH_CVE_2014_4943
-	bool "Arbitrary kernel code execution via PPPOL2TP -ID: CVE-2014-4943"
-	default y
-	help
-	  Since this can never have worked so nobody could possibly have depended
-	  on that functionality, just remove the broken code and return -EINVAL.
 
 endmenu
 
