@@ -156,11 +156,9 @@ int mdss_mdp_overlay_req_check(struct msm_fb_data_type *mfd,
 			pr_err("Invalid decimation factors horz=%d vert=%d\n",
 					req->horz_deci, req->vert_deci);
 			return -EINVAL;
-#ifdef CONFIG_F_QUALCOMM_VIDEO_PLAYER_HALT
 		} else if (req->flags & MDP_BWC_EN) {
 			pr_err("Decimation can't be enabled with BWC\n");
 			return -EINVAL;
-#endif
 		}
 	}
 
