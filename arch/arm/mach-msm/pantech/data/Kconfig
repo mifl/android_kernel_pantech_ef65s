@@ -69,6 +69,14 @@ config SKY_DS_IPSEC
 	select INET_XFRM_TUNNEL
 	help
 
+config LGU_DS_TCP_SYN_RETRANSMIT
+	bool "TCP SYN RETRANSMIT"
+	depends on (PANTECH_LGU)
+	default y
+	help
+	  Select if you want to change RTO and TCP_SYN_RETRIES when TCP syn transfer
+	  tcp resync nymber is 5.(first transfer, 1s, 2s, 4s, 8s)
+
 config SKY_DS_SUPPORT_TUN
 	bool "support for tun driver"
 	default y
