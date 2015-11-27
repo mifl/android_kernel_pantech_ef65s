@@ -60,30 +60,6 @@ config DEFINE_LIST_EF62L
 	select PANTECH_CAMERA_EF60_SS
 endif
 
-if MACH_MSM8974_EF63S
-config DEFINE_LIST_EF63S
-	bool
-	default y
-	select PANTECH_CAMERA_EF63_SS
-	select PANTECH_CAMERA_ADD_OIS
-endif
-
-if MACH_MSM8974_EF63K
-config DEFINE_LIST_EF63K
-	bool
-	default y
-	select PANTECH_CAMERA_EF63_SS
-	select PANTECH_CAMERA_ADD_OIS
-endif
-
-if MACH_MSM8974_EF63L
-config DEFINE_LIST_EF63L
-	bool
-	default y
-	select PANTECH_CAMERA_EF63_SS
-	select PANTECH_CAMERA_ADD_OIS
-endif
-
 if MACH_MSM8974_EF65S
 config DEFINE_LIST_EF65S
 	bool
@@ -105,9 +81,6 @@ config PANTECH_CAMERA_EF59_SS
 	bool
 
 config PANTECH_CAMERA_EF60_SS
-	bool
-
-config PANTECH_CAMERA_EF63_SS
 	bool
 
 config PANTECH_CAMERA_EF65_SS

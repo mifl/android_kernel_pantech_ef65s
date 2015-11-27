@@ -31,27 +31,6 @@ config MACH_MSM8974_EF62L
 	help
 	  Support for the Pantech MSM8974 Ef62l device.
 
-config MACH_MSM8974_EF63S
-	depends on ARCH_MSM8974
-	bool "MSM8974 EF63S"
-	select CUST_PANTECH_H
-	help
-	  Support for the Pantech MSM8974 Ef63s device.
-
-config MACH_MSM8974_EF63K
-	depends on ARCH_MSM8974
-	bool "MSM8974 EF63K"
-	select CUST_PANTECH_H
-	help
-	  Support for the Pantech MSM8974 Ef63k device.
-
-config MACH_MSM8974_EF63L
-	depends on ARCH_MSM8974
-	bool "MSM8974 EF63L"
-	select CUST_PANTECH_H
-	help
-	  Support for the Pantech MSM8974 Ef63l device.
-
 config MACH_MSM8974_EF56S
 	depends on ARCH_MSM8974
 	bool "MSM8974 EF56S"
@@ -191,52 +170,6 @@ config DEFINE_LIST_EF62L
 	select PANTECH_SND
 	select PANTECH_SND_QCOM_PATCH
 	select PANTECH_SND_QSOUND
-	select PANTECH_SND_FLAC
-endif
-
-if MACH_MSM8974_EF63S
-config DEFINE_LIST_EF63S
-	bool
-	default y
-	select PANTECH
-	select PANTECH_DOMESTIC
-	select PANTECH_ERR_CRASH_LOGGING
-	select PANTECH_FS_AUTO_REPAIR
-	select NLS_UTF8
-	select PANTECH_SND
-	select PANTECH_SND_QCOM_PATCH
-	select PANTECH_SND_BOOTUP_HEADSET_INFO
-	select PANTECH_SND_NXP
-	select PANTECH_SND_FLAC
-endif
-
-if MACH_MSM8974_EF63K
-config DEFINE_LIST_EF63K
-	bool
-	default y
-	select PANTECH
-	select PANTECH_DOMESTIC
-	select PANTECH_ERR_CRASH_LOGGING
-	select PANTECH_FS_AUTO_REPAIR
-	select NLS_UTF8
-	select PANTECH_SND
-	select PANTECH_SND_QCOM_PATCH
-	select PANTECH_SND_NXP
-	select PANTECH_SND_FLAC
-endif
-
-if MACH_MSM8974_EF63L
-config DEFINE_LIST_EF63L
-	bool
-	default y
-	select PANTECH
-	select PANTECH_DOMESTIC
-	select PANTECH_ERR_CRASH_LOGGING
-	select PANTECH_FS_AUTO_REPAIR
-	select NLS_UTF8
-	select PANTECH_SND
-	select PANTECH_SND_QCOM_PATCH
-	select PANTECH_SND_NXP
 	select PANTECH_SND_FLAC
 endif
 
