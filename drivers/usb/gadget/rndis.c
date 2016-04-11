@@ -946,7 +946,11 @@ int rndis_set_param_dev(u8 configNr, struct net_device *dev, u16 *cdc_filter)
 
 	rndis_per_dev_params[configNr].dev = dev;
 #ifdef CONFIG_SKY_DS_CHANGE_RNDIS_MTU
+#if defined(CONFIG_PANTECH_KT)
+	rndis_per_dev_params[configNr].dev->mtu = 1450;
+#elif defined(CONFIG_PANTECH_SKT)
 	rndis_per_dev_params[configNr].dev->mtu = 1440;
+#endif
 #endif /* CONFIG_SKY_DS_CHANGE_RNDIS_MTU */
 	rndis_per_dev_params[configNr].filter = cdc_filter;
 

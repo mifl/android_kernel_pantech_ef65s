@@ -79,6 +79,7 @@ config DEFINE_LIST_EF56S
 	select PANTECH_SND_BOOTUP_HEADSET_INFO
 	select PANTECH_SND_NXP
 	select PANTECH_SND_FLAC
+	select PANTECH_SKT
 endif
 
 if MACH_MSM8974_EF59S
@@ -95,6 +96,7 @@ config DEFINE_LIST_EF59S
 	select PANTECH_SND_BOOTUP_HEADSET_INFO
 	select PANTECH_SND_NXP
 	select PANTECH_SND_FLAC
+	select PANTECH_SKT
 endif
 
 if MACH_MSM8974_EF59K
@@ -110,6 +112,7 @@ config DEFINE_LIST_EF59K
 	select PANTECH_SND_QCOM_PATCH
 	select PANTECH_SND_NXP
 	select PANTECH_SND_FLAC
+	select PANTECH_KT
 endif
 
 if MACH_MSM8974_EF59L
@@ -125,6 +128,7 @@ config DEFINE_LIST_EF59L
 	select PANTECH_SND_QCOM_PATCH
 	select PANTECH_SND_NXP
 	select PANTECH_SND_FLAC
+	select PANTECH_LGU
 endif
 
 if MACH_MSM8974_EF60S
@@ -141,6 +145,7 @@ config DEFINE_LIST_EF60S
 	select PANTECH_SND_BOOTUP_HEADSET_INFO
 	select PANTECH_SND_NXP
 	select PANTECH_SND_FLAC
+	select PANTECH_SKT
 endif
 
 if MACH_MSM8974_EF61K
@@ -156,6 +161,7 @@ config DEFINE_LIST_EF61K
 	select PANTECH_SND_QCOM_PATCH
 	select PANTECH_SND_NXP
 	select PANTECH_SND_FLAC
+	select PANTECH_KT
 endif
 
 if MACH_MSM8974_EF62L
@@ -171,6 +177,7 @@ config DEFINE_LIST_EF62L
 	select PANTECH_SND_QCOM_PATCH
 	select PANTECH_SND_QSOUND
 	select PANTECH_SND_FLAC
+	select PANTECH_LGU
 endif
 
 if MACH_MSM8974_EF65S
@@ -187,6 +194,7 @@ config DEFINE_LIST_EF65S
 	select PANTECH_SND_BOOTUP_HEADSET_INFO
 	select PANTECH_SND_NXP
 	select PANTECH_SND_FLAC
+	select PANTECH_SKT
 endif
 
 config EV10
@@ -275,6 +283,18 @@ config PANTECH_JAPAN_PMC
 
 config PANTECH_DOMESTIC
 	bool
+
+config PANTECH_KT
+	bool "Pantech devices for Korea Telecom carrier"
+	default n
+
+config PANTECH_LGU
+	bool "Pantech devices for LG U+ carrier"
+	default n
+
+config PANTECH_SKT
+	bool "Pantech devices for SK Telecom carrier"
+	default n
 
 config PANTECH_ERR_CRASH_LOGGING
 	bool

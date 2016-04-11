@@ -83,6 +83,7 @@ config SKY_DS_SUPPORT_BACKGROUND_TRFFIC_CONTROL_AGENT
 
 config SKY_DS_CTS_LOCALHOST
 	bool "support for traffic statistic each uid"
+	depends on (PANTECH_KT || PANTECH_SKT)
 	default y
 	select UID_STAT
 	help
@@ -94,12 +95,14 @@ config SKY_DS_BAM_ADAPTIVE_TIMER_OFF
 	  DL Throughput
 
 config SKY_DS_CHANGE_RNDIS_MTU
-	bool "changed rndis mtu size to 1440"
+	bool "changed rndis mtu size to 1440 or 1450"
+	depends on (PANTECH_KT || PANTECH_SKT)
 	default y
 	help
 
 config SKY_DS_OPTIMIZE_IPV6_ASSIGNMENT
 	bool "IPv6 Address Asignment"
+	depends on (PANTECH_LGU || PANTECH_SKT)
 	default y
 	help
 
