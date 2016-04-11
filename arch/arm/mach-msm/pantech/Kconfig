@@ -415,4 +415,13 @@ config PANTECH_PS_WIFI_COM_PREF_LOGGING
 	bool "PANTECH PS WIFI COM PREF LOGGING"
 	default y
 
+config FEATURE_SKY_CP_F3_TRACE
+	bool "Enable f3trace commands"
+	depends on (PANTECH_KT || PANTECH_SKT)
+	default y
+
+config FEATURE_SKY_CP_DMLOGGING_DPL
+	bool "Enable DMLOGGING DPL"
+	default y
+
 endif
