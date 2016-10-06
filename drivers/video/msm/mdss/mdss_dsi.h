@@ -265,12 +265,13 @@ struct mdss_dsi_ctrl_pdata {
 	int disp_en_gpio;
 	int disp_te_gpio;
 	int mode_gpio;
+#ifdef CONFIG_F_SKYDISP_COMMON
 	int bl_en_gpio;
 	int lcd_vcip_reg_en_gpio;
 	int lcd_vcin_reg_en_gpio;
 	int lcd_vddio_reg_en_gpio;
 	int lcd_vddio_switch_en_gpio;
-
+#endif
 	int disp_te_gpio_requested;
 	int bklt_ctrl;	/* backlight ctrl */
 	int pwm_period;
@@ -381,7 +382,9 @@ bool __mdss_dsi_clk_enabled(struct mdss_dsi_ctrl_pdata *ctrl, u8 clk_type);
 int mdss_dsi_panel_init(struct device_node *node,
 		struct mdss_dsi_ctrl_pdata *ctrl_pdata,
 		bool cmd_cfg_cont_splash);
+#ifdef CONFIG_F_SKYDISP_COMMON
 void mdss_set_tx_power_mode(int mode, struct mdss_panel_data *pdata);
+#endif
 
 static inline bool mdss_dsi_broadcast_mode_enabled(void)
 {

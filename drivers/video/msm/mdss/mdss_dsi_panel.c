@@ -28,7 +28,9 @@
 #include "mdss_dsi.h"
 #include "mdss_mdp.h"
 
+#ifdef CONFIG_F_SKYDISP_COMMON
 extern struct msm_fb_data_type * mfdmsm_fb_get_mfd(void);
+#endif
 
 #define DT_CMD_HDR 6
 
@@ -511,17 +513,21 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 							u32 bl_level)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
+#ifdef CONFIG_F_SKYDISP_COMMON
 	struct msm_fb_data_type * mfd = mfdmsm_fb_get_mfd();
+#endif
 
 	if (pdata == NULL) {
 		pr_err("%s: Invalid input data\n", __func__);
 		return;
 	}
 
+#ifdef CONFIG_F_SKYDISP_COMMON
 	if (!mfd->panel_power_on) {
 		printk("[%s] panel is off state (%d).....\n",__func__,mfd->panel_power_on);
 		return;
 	}
+#endif
 
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
@@ -627,7 +633,11 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 #ifdef CONFIG_F_SKYDISP_SHARP_DIMMING_CTRL
 	ctrl->onoff_state =1;
 #endif
+#ifdef CONFIG_F_SKYDISP_COMMON
 	pr_err("%s:-\n", __func__);
+#else
+	pr_debug("%s:-\n", __func__);
+#endif
 	return 0;
 }
 
@@ -659,7 +669,11 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 #ifdef CONFIG_F_SKYDISP_SHARP_DIMMING_CTRL
 	ctrl->onoff_state =0;
 #endif
+#ifdef CONFIG_F_SKYDISP_COMMON
 	pr_err("%s:-\n", __func__);
+#else
+	pr_debug("%s:-\n", __func__);
+#endif
 	return 0;
 }
 
@@ -780,7 +794,11 @@ static int mdss_dsi_parse_dcs_cmds(struct device_node *np,
 	else
 		pcmds->link_state = DSI_LP_MODE;
 
+#ifdef CONFIG_F_SKYDISP_COMMON
 	pr_err("%s: dcs_cmd=%x len=%d, cmd_cnt=%d link_state=%d\n", __func__,
+#else
+	pr_debug("%s: dcs_cmd=%x len=%d, cmd_cnt=%d link_state=%d\n", __func__,
+#endif
 		pcmds->buf[0], pcmds->blen, pcmds->cmd_cnt, pcmds->link_state);
 
 	return 0;
