@@ -298,8 +298,7 @@ struct mdss_dsi_ctrl_pdata {
 	int lcd_cmds_check;
 	struct dsi_panel_cmds on_cmds_user;
 #endif
-#if defined(CONFIG_MACH_MSM8974_EF56S) || defined(CONFIG_F_SKYDISP_EF60_SS) || \
-    defined(CONFIG_F_SKYDISP_EF59_SS)
+#ifdef CONFIG_F_SKYDISP_COMMON
 	int lcd_on_skip_during_bootup;
 #endif
 

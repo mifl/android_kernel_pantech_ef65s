@@ -137,8 +137,7 @@ static void mdss_dsi_panel_cmds_send(struct mdss_dsi_ctrl_pdata *ctrl,
 	mdss_dsi_cmdlist_put(ctrl, &cmdreq);
 }
 
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
-    defined(CONFIG_F_SKYDISP_EF60_SS)
+#ifdef CONFIG_F_SKYDISP_COMMON
 static char led_pwm1[3] = {0x51, 0x00, 0x00};	/* DTYPE_DCS_LWRITE */
 static struct dsi_cmd_desc backlight_cmd = {
 	{DTYPE_DCS_LWRITE, 1, 0, 0, 1, sizeof(led_pwm1)},
@@ -242,8 +241,7 @@ static int mdss_dsi_request_gpios(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 	int rc = 0;
 
 #ifdef CONFIG_F_SKYDISP_BOTTOM_CURRENT
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
-    defined(CONFIG_F_SKYDISP_EF60_SS)
+#ifdef CONFIG_F_SKYDISP_COMMON
 	if (ctrl_pdata->reset_request_set)
 		return 0;
 
@@ -301,8 +299,7 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 {
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
 	struct mdss_panel_info *pinfo = NULL;
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
-    defined(CONFIG_F_SKYDISP_EF60_SS)
+#ifdef CONFIG_F_SKYDISP_COMMON
 	int rc = 0;
 #else
 	int i, rc = 0;
@@ -317,8 +314,7 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 				panel_data);
 
 #ifdef CONFIG_F_SKYDISP_BOTTOM_CURRENT
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
-    defined(CONFIG_F_SKYDISP_EF60_SS)
+#ifdef CONFIG_F_SKYDISP_COMMON
 	if (!gpio_is_valid(ctrl_pdata->rst_gpio)) {
 		pr_debug("%s:%d, reset line not configured\n",
 			   __func__, __LINE__);
@@ -504,8 +500,7 @@ void cabc_control(struct mdss_panel_data *pdata, int state)
 }
 #endif /* CONFIG_F_SKYDISP_CABC_CONTROL */
 
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
-    defined(CONFIG_F_SKYDISP_EF60_SS)
+#ifdef CONFIG_F_SKYDISP_COMMON
 bool first_enable = false;
 #endif
 
@@ -531,8 +526,7 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
-    defined(CONFIG_F_SKYDISP_EF60_SS)
+#ifdef CONFIG_F_SKYDISP_COMMON
 	if (bl_level == 0) {
 		gpio_set_value((ctrl_pdata->bl_en_gpio), 0);
 		first_enable = false;
@@ -563,14 +557,12 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 		mdss_dsi_panel_bklt_pwm(ctrl_pdata, bl_level);
 		break;
 	case BL_DCS_CMD:
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
-    defined(CONFIG_F_SKYDISP_EF60_SS)
+#ifdef CONFIG_F_SKYDISP_COMMON
 		mdss_set_tx_power_mode(0 , pdata);
 		msleep(2);
 #endif
 		mdss_dsi_panel_bklt_dcs(ctrl_pdata, bl_level);
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
-    defined(CONFIG_F_SKYDISP_EF60_SS)
+#ifdef CONFIG_F_SKYDISP_COMMON
 		msleep(1);
 		mdss_set_tx_power_mode(1 , pdata);
 #endif
@@ -661,8 +653,7 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 	if (ctrl->off_cmds.cmd_cnt)
 		mdss_dsi_panel_cmds_send(ctrl, &ctrl->off_cmds);
 
-#if defined(CONFIG_MACH_MSM8974_EF56S) || defined(CONFIG_F_SKYDISP_EF60_SS) || \
-    defined(CONFIG_F_SKYDISP_EF59_SS)
+#ifdef CONFIG_F_SKYDISP_COMMON
 	if (!ctrl->lcd_on_skip_during_bootup)
 		ctrl->lcd_on_skip_during_bootup = true;
 #endif

@@ -2824,8 +2824,7 @@ static int mdss_mdp_overlay_splash_image(struct msm_fb_data_type *mfd,
 	int rc = 0;
 	struct fb_info *fbi = NULL;
 	int image_len = 0;
-#if defined(CONFIG_F_SKYDISP_EF56_SS) || defined(CONFIG_F_SKYDISP_EF59_SS) || \
-    defined(CONFIG_F_SKYDISP_EF60_SS)
+#ifdef CONFIG_F_SKYDISP_COMMON
 	return 0;
 #endif
 
