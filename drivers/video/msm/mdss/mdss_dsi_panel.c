@@ -241,25 +241,11 @@ static int mdss_dsi_request_gpios(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 	int rc = 0;
 
 #ifdef CONFIG_F_SKYDISP_BOTTOM_CURRENT
-#ifdef CONFIG_F_SKYDISP_COMMON
 	if (ctrl_pdata->reset_request_set)
 		return 0;
-
-	rc = gpio_request(ctrl_pdata->rst_gpio, "disp_rst_n");
-	if (rc) {
-		pr_err("request reset gpio failed, rc=%d\n", rc);
-		gpio_free(ctrl_pdata->rst_gpio);
-	}
-
-	rc = gpio_direction_output(ctrl_pdata->rst_gpio, 1);
-	if (rc) {
-		pr_err("direction reset gpio failed, rc=%d\n", rc);
-	}
-	ctrl_pdata->reset_request_set =1;
-
-	return rc;
 #endif
-#else /* QCOM Original */
+
+#ifndef CONFIG_F_SKYDISP_COMMON
 	if (gpio_is_valid(ctrl_pdata->disp_en_gpio)) {
 		rc = gpio_request(ctrl_pdata->disp_en_gpio,
 						"disp_enable");
@@ -269,12 +255,23 @@ static int mdss_dsi_request_gpios(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 			goto disp_en_gpio_err;
 		}
 	}
+#endif
 	rc = gpio_request(ctrl_pdata->rst_gpio, "disp_rst_n");
 	if (rc) {
 		pr_err("request reset gpio failed, rc=%d\n",
 			rc);
+#ifdef CONFIG_F_SKYDISP_COMMON
+		gpio_free(ctrl_pdata->rst_gpio);
+#else
 		goto rst_gpio_err;
+#endif
 	}
+#ifdef CONFIG_F_SKYDISP_COMMON
+	rc = gpio_direction_output(ctrl_pdata->rst_gpio, 1);
+	if (rc) {
+		pr_err("direction reset gpio failed, rc=%d\n", rc);
+	}
+#else
 	if (gpio_is_valid(ctrl_pdata->mode_gpio)) {
 		rc = gpio_request(ctrl_pdata->mode_gpio, "panel_mode");
 		if (rc) {
@@ -283,8 +280,13 @@ static int mdss_dsi_request_gpios(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 			goto mode_gpio_err;
 		}
 	}
+#endif
+#ifdef CONFIG_F_SKYDISP_BOTTOM_CURRENT
+	ctrl_pdata->reset_request_set =1;
+#endif
 	return rc;
 
+#ifndef CONFIG_F_SKYDISP_COMMON
 mode_gpio_err:
 	gpio_free(ctrl_pdata->rst_gpio);
 rst_gpio_err:
@@ -292,7 +294,7 @@ rst_gpio_err:
 		gpio_free(ctrl_pdata->disp_en_gpio);
 disp_en_gpio_err:
 	return rc;
-#endif /* QCOM Original */
+#endif
 }
 
 int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
@@ -313,8 +315,13 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
 
-#ifdef CONFIG_F_SKYDISP_BOTTOM_CURRENT
-#ifdef CONFIG_F_SKYDISP_COMMON
+#ifndef CONFIG_F_SKYDISP_COMMON
+	if (!gpio_is_valid(ctrl_pdata->disp_en_gpio)) {
+		pr_debug("%s:%d, reset line not configured\n",
+			   __func__, __LINE__);
+	}
+#endif
+
 	if (!gpio_is_valid(ctrl_pdata->rst_gpio)) {
 		pr_debug("%s:%d, reset line not configured\n",
 			   __func__, __LINE__);
@@ -330,51 +337,14 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 			pr_err("gpio request failed\n");
 			return rc;
 		}
-
+#ifdef CONFIG_F_SKYDISP_COMMON
 		if (!pinfo->panel_power_on) {
 			if (gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio))
 				gpio_set_value((ctrl_pdata->lcd_vcip_reg_en_gpio), 1);
 			msleep(20);
 			gpio_set_value((ctrl_pdata->rst_gpio), 1);
 		}
-
-		if (ctrl_pdata->ctrl_state & CTRL_STATE_PANEL_INIT) {
-			pr_debug("%s: Panel Not properly turned OFF\n",
-						__func__);
-			ctrl_pdata->ctrl_state &= ~CTRL_STATE_PANEL_INIT;
-			pr_debug("%s: Reset panel done\n", __func__);
-		}
-	} else {
-		gpio_set_value((ctrl_pdata->rst_gpio), 0);
-
-		msleep(1);
-
-		if (gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio))
-			gpio_set_value((ctrl_pdata->lcd_vcip_reg_en_gpio), 0);  // 34
-		msleep(50);
-	}
-#endif
 #else /* QCOM Original */
-	if (!gpio_is_valid(ctrl_pdata->disp_en_gpio)) {
-		pr_debug("%s:%d, reset line not configured\n",
-			   __func__, __LINE__);
-	}
-
-	if (!gpio_is_valid(ctrl_pdata->rst_gpio)) {
-		pr_debug("%s:%d, reset line not configured\n",
-			   __func__, __LINE__);
-		return rc;
-	}
-
-	pr_debug("%s: enable = %d\n", __func__, enable);
-	pinfo = &(ctrl_pdata->panel_data.panel_info);
-
-	if (enable) {
-		rc = mdss_dsi_request_gpios(ctrl_pdata);
-		if (rc) {
-			pr_err("gpio request failed\n");
-			return rc;
-		}
 		if (!pinfo->panel_power_on) {
 			if (gpio_is_valid(ctrl_pdata->disp_en_gpio))
 				gpio_set_value((ctrl_pdata->disp_en_gpio), 1);
@@ -393,6 +363,7 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 			else if (pinfo->mode_gpio_state == MODE_GPIO_LOW)
 				gpio_set_value((ctrl_pdata->mode_gpio), 0);
 		}
+#endif /* QCOM Original */
 		if (ctrl_pdata->ctrl_state & CTRL_STATE_PANEL_INIT) {
 			pr_debug("%s: Panel Not properly turned OFF\n",
 						__func__);
@@ -400,6 +371,13 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 			pr_debug("%s: Reset panel done\n", __func__);
 		}
 	} else {
+#ifdef CONFIG_F_SKYDISP_COMMON
+		gpio_set_value((ctrl_pdata->rst_gpio), 0);
+		msleep(1);
+		if (gpio_is_valid(ctrl_pdata->lcd_vcip_reg_en_gpio))
+			gpio_set_value((ctrl_pdata->lcd_vcip_reg_en_gpio), 0);  // 34
+		msleep(50);
+#else /* QCOM Original */
 		if (gpio_is_valid(ctrl_pdata->disp_en_gpio)) {
 			gpio_set_value((ctrl_pdata->disp_en_gpio), 0);
 			gpio_free(ctrl_pdata->disp_en_gpio);
@@ -408,8 +386,8 @@ int mdss_dsi_panel_reset(struct mdss_panel_data *pdata, int enable)
 		gpio_free(ctrl_pdata->rst_gpio);
 		if (gpio_is_valid(ctrl_pdata->mode_gpio))
 			gpio_free(ctrl_pdata->mode_gpio);
-	}
 #endif /* QCOM Original */
+	}
 	return rc;
 }
 
@@ -526,6 +504,7 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
+
 #ifdef CONFIG_F_SKYDISP_COMMON
 	if (bl_level == 0) {
 		gpio_set_value((ctrl_pdata->bl_en_gpio), 0);
@@ -602,8 +581,6 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 
 #ifdef CONFIG_F_SKYDISP_CMDS_CONTROL
 	if (ctrl->lcd_cmds_check == false) {
-#endif
-
 		if (ctrl->on_cmds.cmd_cnt) {
 #if defined(CONFIG_MACH_MSM8974_EF56S) || defined(CONFIG_F_SKYDISP_EF60_SS)
 			if (ctrl->lcd_on_skip_during_bootup)
@@ -614,12 +591,14 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 #endif
 			mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds);
 		}
-#ifdef CONFIG_F_SKYDISP_CMDS_CONTROL
 	} else if (ctrl->lcd_cmds_check == true) {
 		if (ctrl->on_cmds_user.cmd_cnt)
 			mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds_user);
 		pr_info("user LCD on cmds---------------->\n");
 	}
+#else
+	if (ctrl->on_cmds.cmd_cnt)
+		mdss_dsi_panel_cmds_send(ctrl, &ctrl->on_cmds);
 #endif
 
 #ifdef CONFIG_F_SKYDISP_SHARP_DIMMING_CTRL

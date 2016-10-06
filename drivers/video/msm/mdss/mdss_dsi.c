@@ -53,7 +53,6 @@ static int mdss_dsi_regulator_init(struct platform_device *pdev)
 
 static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata, int enable)
 {
-#ifdef CONFIG_F_SKYDISP_COMMON
 	int ret;
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
 
@@ -76,7 +75,7 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata, int enable)
 				__func__, ret);
 			goto error;
 		}
-
+#ifdef CONFIG_F_SKYDISP_COMMON
 		if (gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio))
 			gpio_set_value((ctrl_pdata->lcd_vddio_switch_en_gpio), 1);  //14
 
@@ -86,6 +85,7 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata, int enable)
 			gpio_set_value((ctrl_pdata->lcd_vddio_reg_en_gpio), 1); //69
 
 		msleep(10);
+#endif
 
 		if (!pdata->panel_info.mipi.lp11_init) {
 			ret = mdss_dsi_panel_reset(pdata, 1);
@@ -106,7 +106,7 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata, int enable)
 					__func__, ret);
 			goto error;
 		}
-
+#ifdef CONFIG_F_SKYDISP_COMMON
 		if (gpio_is_valid(ctrl_pdata->lcd_vddio_switch_en_gpio))
 			gpio_set_value((ctrl_pdata->lcd_vddio_switch_en_gpio), 0);  //14
 
@@ -114,7 +114,7 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata, int enable)
 
 		if (gpio_is_valid(ctrl_pdata->lcd_vddio_reg_en_gpio))
 			gpio_set_value((ctrl_pdata->lcd_vddio_reg_en_gpio), 0); //69
-
+#endif
 		ret = msm_dss_enable_vreg(
 			ctrl_pdata->power_data.vreg_config,
 			ctrl_pdata->power_data.num_vreg, 0);
@@ -125,60 +125,6 @@ static int mdss_dsi_panel_power_on(struct mdss_panel_data *pdata, int enable)
 	}
 error:
 	return ret;
-#else /* QUALCOMM default */
-	int ret;
-	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
-
-	if (pdata == NULL) {
-		pr_err("%s: Invalid input data\n", __func__);
-		ret = -EINVAL;
-		goto error;
-	}
-
-	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
-				panel_data);
-	pr_debug("%s: enable=%d\n", __func__, enable);
-
-	if (enable) {
-		ret = msm_dss_enable_vreg(
-			ctrl_pdata->power_data.vreg_config,
-			ctrl_pdata->power_data.num_vreg, 1);
-		if (ret) {
-			pr_err("%s:Failed to enable vregs.rc=%d\n",
-				__func__, ret);
-			goto error;
-		}
-
-		if (!pdata->panel_info.mipi.lp11_init) {
-			ret = mdss_dsi_panel_reset(pdata, 1);
-			if (ret) {
-				pr_err("%s: Panel reset failed. rc=%d\n",
-						__func__, ret);
-				if (msm_dss_enable_vreg(
-				ctrl_pdata->power_data.vreg_config,
-				ctrl_pdata->power_data.num_vreg, 0))
-					pr_err("Disable vregs failed\n");
-				goto error;
-			}
-		}
-	} else {
-		ret = mdss_dsi_panel_reset(pdata, 0);
-		if (ret) {
-			pr_err("%s: Panel reset failed. rc=%d\n",
-					__func__, ret);
-			goto error;
-		}
-		ret = msm_dss_enable_vreg(
-			ctrl_pdata->power_data.vreg_config,
-			ctrl_pdata->power_data.num_vreg, 0);
-		if (ret) {
-			pr_err("%s: Failed to disable vregs.rc=%d\n",
-				__func__, ret);
-		}
-	}
-error:
-	return ret;
-#endif /* QUALCOMM default */
 }
 
 static void mdss_dsi_put_dt_vreg_data(struct device *dev,
@@ -1061,13 +1007,17 @@ static int mdss_dsi_event_handler(struct mdss_panel_data *pdata,
 		rc = mdss_dsi_on(pdata);
 		mdss_dsi_op_mode_config(pdata->panel_info.mipi.mode,
 							pdata);
-		if (ctrl_pdata->on_cmds.link_state == DSI_LP_MODE) {
 #ifdef CONFIG_F_SKYDISP_SILENT_BOOT
+		if (ctrl_pdata->on_cmds.link_state == DSI_LP_MODE) {
 			if (pdata->silent_backlight  == true)
 				break;
-#endif
+
 			rc = mdss_dsi_unblank(pdata);
 		}
+#else
+		if (ctrl_pdata->on_cmds.link_state == DSI_LP_MODE)
+			rc = mdss_dsi_unblank(pdata);
+#endif
 		break;
 	case MDSS_EVENT_PANEL_ON:
 		ctrl_pdata->ctrl_state |= CTRL_STATE_MDP_ACTIVE;
