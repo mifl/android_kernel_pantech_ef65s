@@ -21,7 +21,7 @@ BUILD_KERNEL_LOG=kernel_log.txt
 ###############################################################################
 
 export ARCH=arm
-export PATH=$(pwd)/../../../prebuilts/gcc/linux-x86/arm/arm-eabi-4.6/bin:$PATH
+export PATH=$(pwd)/../../../prebuilts/gcc/linux-x86/arm/arm-eabi-4.7/bin:$PATH
 export CROSS_COMPILE=arm-eabi-
 
 ###############################################################################

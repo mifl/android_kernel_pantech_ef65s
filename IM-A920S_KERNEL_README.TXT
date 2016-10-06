@@ -1,6 +1,6 @@
 How to Build:
 
-    1. Get Toolchain (arm-eabi-4.6) and install
+    1. Get Toolchain (arm-eabi-4.7) and install
        (Visit android git server or codesourcery)
 
     2. Build the Kernel:
