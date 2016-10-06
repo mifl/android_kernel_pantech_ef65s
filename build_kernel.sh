@@ -1,30 +1,51 @@
 #!/bin/bash
 ###############################################################################
 #
-#                           Kernel Build Script 
+# Kernel Build Script
 #
 ###############################################################################
 # 2011-10-24 effectivesky : modified
 # 2010-12-29 allydrop     : created
 ###############################################################################
 
-##############################################################################
-# set toolchain
-##############################################################################
+###############################################################################
+# Set variables
+###############################################################################
+BUILD_KERNEL_OUT_DIR=obj
+BUILD_KERNEL_OUT_SUBDIR=KERNEL_OBJ
+BUILD_JOB_NUMBER=`grep processor /proc/cpuinfo | wc -l`
+BUILD_KERNEL_LOG=kernel_log.txt
+
+###############################################################################
+# Set toolchain
+###############################################################################
 
 export ARCH=arm
 export PATH=$(pwd)/../../../prebuilts/gcc/linux-x86/arm/arm-eabi-4.6/bin:$PATH
 export CROSS_COMPILE=arm-eabi-
 
-##############################################################################
-# make zImage
-##############################################################################
+###############################################################################
+# Set defconfig
+###############################################################################
 
-mkdir -p ./obj/KERNEL_OBJ/
-make ARCH=arm O=./obj/KERNEL_OBJ/ ef65s_defconfig
-make -j4 ARCH=arm O=./obj/KERNEL_OBJ/ 2>&1 | tee kernel_log.txt
+DEFCONFIG_FILE=$1
+if [ ! -e arch/arm/configs/$DEFCONFIG_FILE ]; then
+	echo "No such file : arch/arm/configs/$DEFCONFIG_FILE"
+	exit -1
+fi
 
-##############################################################################
+###############################################################################
+# Build kernel
+###############################################################################
+
+mkdir -p ./$BUILD_KERNEL_OUT_DIR/$BUILD_KERNEL_OUT_SUBDIR/
+make ARCH=arm O=./$BUILD_KERNEL_OUT_DIR/$BUILD_KERNEL_OUT_SUBDIR/ ${DEFCONFIG_FILE}
+make -j$BUILD_JOB_NUMBER ARCH=arm O=./$BUILD_KERNEL_OUT_DIR/$BUILD_KERNEL_OUT_SUBDIR/ 2>&1 | tee $BUILD_KERNEL_LOG
+
+###############################################################################
 # Copy Kernel Image
-##############################################################################
-cp -f ./obj/KERNEL_OBJ/arch/arm/boot/zImage .
+###############################################################################
+
+if [ -f ./$BUILD_KERNEL_OUT_DIR/$BUILD_KERNEL_OUT_SUBDIR/arch/arm/boot/zImage ]; then
+	cp -f ./$BUILD_KERNEL_OUT_DIR/$BUILD_KERNEL_OUT_SUBDIR/arch/arm/boot/zImage ./
+fi

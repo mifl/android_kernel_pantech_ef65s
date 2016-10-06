@@ -7,7 +7,7 @@ How to Build:
         1) Modify below lines in "build_kernel.sh"
             export PATH=$(pwd)/../../../prebuilts/gcc/linux-x86/arm/arm-eabi-4.6/bin:$PATH
         2) Run Kernel Build Script
-            $ ./build_kernel.sh
+            $ ./build_kernel.sh ef65s_defconfig
 
     3. Output Files:
         - kernel : kernel/zImaze
