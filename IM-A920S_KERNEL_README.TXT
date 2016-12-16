@@ -10,8 +10,9 @@ How to Build:
             $ ./build_kernel.sh ef65s_defconfig
 
     3. Output Files:
-        - kernel : kernel/zImaze
-        - module : kernel/drivers/*/*.ko
+        - kernel: ./mkbootimg/ef65s/zImage
+        - module: ./obj/KERNEL_OBJ/drivers/*/*.ko
+        - boot.img: ./mkbootimg/ef65s/boot.img
 
     4. Clean Kernel:
         1) Modify below lines in "clean_kernel.sh"
